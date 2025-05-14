@@ -46,6 +46,42 @@ class _HistoryState extends State<History> {
           mainAxisAlignment: MainAxisAlignment.end,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Container(
+                  width: 56, 
+                  height: 56,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Color(0xff343738),
+                  ),
+                  child: Center(
+                    child: SvgPicture.asset(
+                      'assets/icons/profile.svg',
+                      width: 25,
+                      height: 25,
+                    ),
+                  ),
+                ),
+                Container(
+                  width: 56, 
+                  height: 56, 
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Color(0xff343738),
+                  ),
+                  child: Center(
+                    child: SvgPicture.asset(
+                      'assets/icons/notifications.svg',
+                      width: 25, 
+                      height: 25, 
+                    ),
+                  ),
+                ),
+              ]
+            ),
             Padding(
               padding: const EdgeInsets.only(right: 100),
               child: Text(
@@ -136,7 +172,7 @@ class _HistoryState extends State<History> {
                 ),
               ),
             ),
-            label: 'Recommendation',
+            label: 'Home',
           ),
           BottomNavigationBarItem(
             icon: Container(
