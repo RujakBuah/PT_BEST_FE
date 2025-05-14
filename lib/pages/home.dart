@@ -20,14 +20,35 @@ class _HistoryState extends State<History> {
       body: ListView(
         children: [
           searchBox(),
-          SizedBox(height: 40),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-
-          )
+          SizedBox(height: 15),
+          selectBar(),
+          SizedBox(height: 15),
+          Column()
         ],
       ),
     );
+  }
+
+  Container selectBar() {
+    return Container(
+          margin: const EdgeInsets.only(left: 23, right: 23),
+          alignment: Alignment.center,
+          height: 33,
+          width: 362,
+          decoration: BoxDecoration(
+            color: Color(0xffC7C9CF),
+            borderRadius: BorderRadius.circular(5),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Requests'),
+              Text('Assigned'),
+              Text('Completed'),
+            ],
+          )
+        );
   }
 
   Widget searchBox() {
@@ -83,7 +104,7 @@ class _HistoryState extends State<History> {
               ]
             ),
             Padding(
-              padding: const EdgeInsets.only(right: 100),
+              padding: const EdgeInsets.only(right: 100, top: 10),
               child: Text(
                 'Search Orders',
                 style: TextStyle(
@@ -101,17 +122,17 @@ class _HistoryState extends State<History> {
                 child: Container(
                   padding: EdgeInsets.only(right:18),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: Color(0xffD9D9D9),
                     borderRadius: BorderRadius.circular(15),
                   ),
                   child: TextField(
                     decoration: InputDecoration(
                       filled: true, 
-                      fillColor: Colors.white,
+                      fillColor: Color(0xffD9D9D9),
                       contentPadding: EdgeInsets.all(15),
                       hintText: 'Search for works',
                       hintStyle: TextStyle(
-                        color: Color(0xffDDDADA), 
+                        color: Color(0xffADADAD), 
                         fontSize: 14
                       ),
                       prefixIcon: Padding(
