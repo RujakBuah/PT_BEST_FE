@@ -1,3 +1,4 @@
+import 'package:pt_best/models/requests.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -11,10 +12,17 @@ class History extends StatefulWidget {
 }
 
 class _HistoryState extends State<History> {
-  int myIndex = 0;
+  List<MixModel> requests = [];
+
+  void _getInitialInfo() {
+    requests = MixModel.getMix();
+  }
+
+  int myIndex = 2;
 
   @override  
   Widget build(BuildContext context) {
+    _getInitialInfo();
     return Scaffold(// optional for better contrast
       bottomNavigationBar: navigationBar(),
       body: ListView(
@@ -23,10 +31,165 @@ class _HistoryState extends State<History> {
           SizedBox(height: 15),
           selectBar(),
           SizedBox(height: 15),
-          Column()
+          requestList()
         ],
       ),
     );
+  }
+
+  Column requestList() {
+    return Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Container(
+              height: 170, 
+              child: ListView.separated(
+                itemBuilder: (context, index) {
+                  return Container(
+                    margin: EdgeInsets.only(left: 30),
+                    width: 315,
+                    decoration: BoxDecoration(
+                      color: Color(0xffD9D9D9),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Container(
+                              margin: EdgeInsets.only(left: 20),
+                              height: 35,
+                              width: 35,
+                              decoration: BoxDecoration(
+                                color: Color(0xffFFFFFF),
+                                shape: BoxShape.circle,
+                              ),
+                              child: Center(
+                                child: SvgPicture.asset(
+                                  'assets/icons/box.svg',
+                                  width: 18,
+                                  height: 18,
+                                )
+                              ),
+                            ),
+                            SizedBox(width: 15),
+                            Text(
+                              requests[index].orderName, 
+                              style: const TextStyle(
+                                color: Colors.black, 
+                                fontSize: 12,
+                                fontWeight: FontWeight.w400
+                              ),
+                            ),
+                            SizedBox(width: 70),
+                            Container(
+                              width: 105,
+                              height: 30,
+                              decoration: BoxDecoration(
+                                color: requests[index].statusColor,
+                                borderRadius: BorderRadius.circular(15),
+                              ),
+                              child: Center(
+                                child: Text(
+                                  requests[index].status,
+                                  style: TextStyle(
+                                    color: Color(0xff222526),
+                                    fontWeight: FontWeight.w400,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ),
+                            )
+                          ],
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            SizedBox(width: 20),
+                            Text(
+                              requests[index].price,
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.w600,
+                                fontSize: 12,
+                              )
+                            ),
+                            SizedBox(width: 185),
+                            SvgPicture.asset('assets/icons/info.svg')
+                          ],
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            SizedBox(width: 20), 
+                            Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Posted by:',
+                                  style: TextStyle(
+                                    color: Color(0xff595B5C),
+                                    fontSize: 10,
+                                  ),
+                                ),
+                                Text(
+                                  requests[index].soliciter,
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            SizedBox(width: 150),
+                            Column(
+                              children: [
+                                Text(
+                                  'Expected on:',
+                                  style: TextStyle(
+                                    color: Color(0xff595B5C),
+                                    fontSize: 10,
+                                  ),
+                                ),
+                                Text(
+                                  requests[index].date,
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                ),
+                                Text(
+                                  '(in ' + requests[index].duration + ')',
+                                  style: TextStyle(
+                                    fontSize: 10, 
+                                    fontWeight: FontWeight.w400,
+                                    color: Colors.black
+                                  ),
+                                )
+                              ],
+                            ),
+                          ],
+                        ),
+                      ]
+                    )
+                  );
+                },
+                separatorBuilder: (context, index) => SizedBox(height: 15,),
+                itemCount: requests.length,
+                scrollDirection: Axis.horizontal,
+                padding: EdgeInsets.only(
+                  left: 20,
+                  right: 20,
+                ),
+              ),
+            ),
+          ],
+        );
   }
 
   Container selectBar() {
