@@ -46,6 +46,18 @@ class MixModel {
       )
     );
 
+    requests.add(
+      MixModel(
+        orderName: 'Order #227',
+        status: 'Rejected',
+        soliciter: 'Moonton',
+        duration: '14 Days',
+        date: '27/05/2026',
+        price: 'Rp 18,900',
+        statusColor: Color(0xffFF3F41)
+      )
+    );
+
     return requests;
   }
 }

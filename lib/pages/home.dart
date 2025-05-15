@@ -39,22 +39,23 @@ class _HistoryState extends State<History> {
 
   Column requestList() {
     return Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
-              height: 170, 
+              height: 800,
               child: ListView.separated(
                 itemBuilder: (context, index) {
                   return Container(
                     margin: EdgeInsets.only(left: 30),
                     width: 315,
+                    height: 175,
                     decoration: BoxDecoration(
                       color: Color(0xffD9D9D9),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      crossAxisAlignment: CrossAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Row(
                           mainAxisAlignment: MainAxisAlignment.start,
@@ -179,12 +180,11 @@ class _HistoryState extends State<History> {
                     )
                   );
                 },
-                separatorBuilder: (context, index) => SizedBox(height: 15,),
+                separatorBuilder: (context, index) => SizedBox(height: 25,),
                 itemCount: requests.length,
-                scrollDirection: Axis.horizontal,
+                scrollDirection: Axis.vertical,
                 padding: EdgeInsets.only(
-                  left: 20,
-                  right: 20,
+                  right: 28,
                 ),
               ),
             ),
