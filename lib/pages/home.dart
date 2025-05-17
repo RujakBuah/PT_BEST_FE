@@ -31,7 +31,8 @@ class _HistoryState extends State<History> {
           SizedBox(height: 15),
           selectBar(),
           SizedBox(height: 15),
-          requestList()
+          requestList(),
+          SizedBox(height: 15),
         ],
       ),
     );
@@ -39,158 +40,188 @@ class _HistoryState extends State<History> {
 
   Column requestList() {
     return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              height: 800,
-              child: ListView.separated(
-                itemBuilder: (context, index) {
-                  return Container(
-                    margin: EdgeInsets.only(left: 30),
-                    width: 315,
-                    height: 175,
-                    decoration: BoxDecoration(
-                      color: Color(0xffD9D9D9),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Container(
-                              margin: EdgeInsets.only(left: 20),
-                              height: 35,
-                              width: 35,
-                              decoration: BoxDecoration(
-                                color: Color(0xffFFFFFF),
-                                shape: BoxShape.circle,
-                              ),
-                              child: Center(
-                                child: SvgPicture.asset(
-                                  'assets/icons/box.svg',
-                                  width: 18,
-                                  height: 18,
-                                )
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        ListView.separated(
+          shrinkWrap: true,
+          physics: NeverScrollableScrollPhysics(), // prevents inner scrolling
+          itemCount: requests.length,
+          separatorBuilder: (context, index) => SizedBox(height: 25),
+          itemBuilder: (context, index) {
+            return Container(
+              margin: EdgeInsets.only(left: 30, right: 30),
+              width: 315,
+              height: 175,
+              decoration: BoxDecoration(
+                color: Color(0xffD9D9D9),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Container(
+                            margin: EdgeInsets.only(left: 20),
+                            width: 35,
+                            height: 35,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: Color(0xffF1F1F1),
+                            ),
+                            child: Center(
+                              child: SvgPicture.asset(
+                                'assets/icons/box.svg',
+                                width: 18,
+                                height: 18,
                               ),
                             ),
-                            SizedBox(width: 15),
-                            Text(
-                              requests[index].orderName, 
-                              style: const TextStyle(
+                          ),
+                          SizedBox(width: 15,),
+                          Text(
+                            requests[index].orderName, 
+                            style: const TextStyle(
+                              color: Colors.black, 
+                              fontSize: 12,
+                              fontWeight: FontWeight.w400
+                            ),
+                          )
+                        ],
+                      ),
+                      Container(
+                        margin: EdgeInsets.only(right: 20),
+                        width: 105,
+                        height: 30,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(20), 
+                          color: requests[index].statusColor,
+                        ),
+                        child: Center(
+                          child: Text(
+                            requests[index].status, 
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold
+                            ),
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(left: 20),
+                        child: Text(
+                          requests[index].price, 
+                          style: TextStyle(
+                            fontSize: 12, 
+                            fontWeight: FontWeight.bold, 
+                            color: Colors.black,
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(right:20),
+                        child: SvgPicture.asset(
+                          'assets/icons/info.svg',
+                          width: 30,
+                          height: 30,
+                        ),
+                      )
+                    ],
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(left: 20),
+                            child: Text(
+                              'Posted By:',
+                              style: TextStyle(
+                                fontSize: 10, 
+                                fontWeight: FontWeight.w400, 
+                                color: Color(0xff595B5C),
+                              ),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(left: 20),
+                            child: Text(
+                              requests[index].soliciter, 
+                              style: TextStyle(
                                 color: Colors.black, 
-                                fontSize: 12,
+                                fontSize: 12, 
                                 fontWeight: FontWeight.w400
                               ),
                             ),
-                            SizedBox(width: 70),
-                            Container(
-                              width: 105,
-                              height: 30,
-                              decoration: BoxDecoration(
-                                color: requests[index].statusColor,
-                                borderRadius: BorderRadius.circular(15),
-                              ),
-                              child: Center(
-                                child: Text(
-                                  requests[index].status,
-                                  style: TextStyle(
-                                    color: Color(0xff222526),
-                                    fontWeight: FontWeight.w400,
-                                    fontSize: 12,
-                                  ),
-                                ),
-                              ),
-                            )
-                          ],
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            SizedBox(width: 20),
-                            Text(
-                              requests[index].price,
+                          ),
+                        ],
+                      ),
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(right: 20),
+                            child: Text(
+                              'Expected On:',
                               style: TextStyle(
+                                fontSize: 10, 
+                                fontWeight: FontWeight.w400, 
+                                color: Color(0xff595B5C),
+                              ),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(right: 20),
+                            child: Text(
+                              requests[index].date,
+                              style: TextStyle(
+                                fontSize: 12, 
+                                fontWeight: FontWeight.bold, 
                                 color: Colors.black,
-                                fontWeight: FontWeight.w600,
-                                fontSize: 12,
-                              )
+                              ),
                             ),
-                            SizedBox(width: 185),
-                            SvgPicture.asset('assets/icons/info.svg')
-                          ],
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            SizedBox(width: 20), 
-                            Column(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Posted by:',
-                                  style: TextStyle(
-                                    color: Color(0xff595B5C),
-                                    fontSize: 10,
-                                  ),
-                                ),
-                                Text(
-                                  requests[index].soliciter,
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w400,
-                                  ),
-                                ),
-                              ],
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(right: 20),
+                            child: Text(
+                              "(in " + requests[index].duration + ")",
+                              style: TextStyle(
+                                fontSize: 10, 
+                                fontWeight: FontWeight.w400, 
+                                color: Colors.black,
+                              ),
                             ),
-                            SizedBox(width: 150),
-                            Column(
-                              children: [
-                                Text(
-                                  'Expected on:',
-                                  style: TextStyle(
-                                    color: Color(0xff595B5C),
-                                    fontSize: 10,
-                                  ),
-                                ),
-                                Text(
-                                  requests[index].date,
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w400,
-                                  ),
-                                ),
-                                Text(
-                                  '(in ' + requests[index].duration + ')',
-                                  style: TextStyle(
-                                    fontSize: 10, 
-                                    fontWeight: FontWeight.w400,
-                                    color: Colors.black
-                                  ),
-                                )
-                              ],
-                            ),
-                          ],
-                        ),
-                      ]
-                    )
-                  );
-                },
-                separatorBuilder: (context, index) => SizedBox(height: 25,),
-                itemCount: requests.length,
-                scrollDirection: Axis.vertical,
-                padding: EdgeInsets.only(
-                  right: 28,
-                ),
+                          ),
+                        ],
+                      )
+                    ],
+                  )
+                ],
               ),
-            ),
-          ],
-        );
+            );
+          },
+        ),
+      ],
+    );
   }
+
 
   Container selectBar() {
     return Container(
