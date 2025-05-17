@@ -19,6 +19,7 @@ class _HistoryState extends State<History> {
   }
 
   int myIndex = 2;
+  int selectedFilter = 0;
 
   @override  
   Widget build(BuildContext context) {
@@ -44,7 +45,7 @@ class _HistoryState extends State<History> {
       children: [
         ListView.separated(
           shrinkWrap: true,
-          physics: NeverScrollableScrollPhysics(), // prevents inner scrolling
+          physics: NeverScrollableScrollPhysics(), 
           itemCount: requests.length,
           separatorBuilder: (context, index) => SizedBox(height: 25),
           itemBuilder: (context, index) {
@@ -222,27 +223,95 @@ class _HistoryState extends State<History> {
     );
   }
 
-
-  Container selectBar() {
-    return Container(
-          margin: const EdgeInsets.only(left: 23, right: 23),
-          alignment: Alignment.center,
-          height: 33,
-          width: 362,
-          decoration: BoxDecoration(
-            color: Color(0xffC7C9CF),
-            borderRadius: BorderRadius.circular(5),
-          ),
+  Padding selectBar() {
+    return Padding(
+      padding: const EdgeInsets.only(left: 23, right: 23),
+      child: Container(
+        width: 362,
+        height: 33,
+        decoration: BoxDecoration(
+          color: Color(0xffC7C9CF),
+          borderRadius: BorderRadius.circular(5),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.only(left: 23, right: 23),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Text('Requests'),
-              Text('Assigned'),
-              Text('Completed'),
+              FilterChip(
+                selected: selectedFilter == 0, 
+                onSelected: (bool selected) => setState(() => selectedFilter = 0),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                selectedColor: Color(0xff717171),
+                backgroundColor: Colors.transparent,
+                label: Container(
+                  margin: EdgeInsets.only(left: 10, right: 10, top: 10, bottom: 10),
+                  child: Center(
+                    child: Text(
+                      "Requests",
+                      style: TextStyle(
+                        fontSize: 14, 
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(width: 10),
+              FilterChip(
+                selected: selectedFilter == 1, 
+                onSelected: (bool selected) => setState(() => selectedFilter = 1),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                selectedColor: Color(0xff717171),
+                backgroundColor: Colors.transparent,
+                label: Container(
+                  margin: EdgeInsets.only(left: 10, right: 10, top: 10, bottom: 10),
+                  child: Center(
+                    child: Text(
+                      "Accepted",
+                      style: TextStyle(
+                        fontSize: 14, 
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(width: 10),
+              FilterChip(
+                selected: selectedFilter == 2, 
+                onSelected: (bool selected) => setState(() => selectedFilter = 2),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                selectedColor: Color(0xff717171),
+                backgroundColor: Colors.transparent,
+                label: Container(
+                  margin: EdgeInsets.only(left: 10, right: 10, top: 10, bottom: 10),
+                  child: Center(
+                    child: Text(
+                      "Completed",
+                      style: TextStyle(
+                        fontSize: 14, 
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black
+                      ),
+                    ),
+                  ),
+                ),
+              ),
             ],
-          )
-        );
+          ),
+        ),
+      ),
+    );
   }
 
   Widget searchBox() {
