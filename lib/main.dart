@@ -14,6 +14,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         fontFamily: 'Inter',
         scaffoldBackgroundColor: const Color(0xff868686),
+        chipTheme: ChipThemeData(iconTheme: IconThemeData(), showCheckmark: false),
       ),
       home: History(),
     );

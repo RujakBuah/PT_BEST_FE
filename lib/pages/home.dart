@@ -225,90 +225,90 @@ class _HistoryState extends State<History> {
 
   Padding selectBar() {
     return Padding(
-      padding: const EdgeInsets.only(left: 23, right: 23),
+      padding: const EdgeInsets.symmetric(horizontal: 23),
       child: Container(
-        width: 362,
-        height: 33,
+        height: 40,
         decoration: BoxDecoration(
           color: Color(0xffC7C9CF),
           borderRadius: BorderRadius.circular(5),
         ),
-        child: Padding(
-          padding: const EdgeInsets.only(left: 23, right: 23),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              FilterChip(
-                selected: selectedFilter == 0, 
+        child: Row(
+          children: [
+            Expanded(
+              child: ChoiceChip(
+                selected: selectedFilter == 0,
                 onSelected: (bool selected) => setState(() => selectedFilter = 0),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
                 selectedColor: Color(0xff717171),
-                backgroundColor: Colors.transparent,
-                label: Container(
-                  margin: EdgeInsets.only(left: 10, right: 10, top: 10, bottom: 10),
-                  child: Center(
+                backgroundColor: Color(0xffC7C9CF),
+                label: Center(
+                  child: Padding(
+                    padding: const EdgeInsets.only(bottom: 15),
                     child: Text(
                       "Requests",
                       style: TextStyle(
-                        fontSize: 14, 
+                        fontSize: 14,
                         fontWeight: FontWeight.bold,
-                        color: Colors.black
+                        color: Colors.black,
                       ),
                     ),
                   ),
                 ),
               ),
-              SizedBox(width: 10),
-              FilterChip(
-                selected: selectedFilter == 1, 
+            ),
+            SizedBox(width: 10),
+            Expanded(
+              child: ChoiceChip(
+                selected: selectedFilter == 1,
                 onSelected: (bool selected) => setState(() => selectedFilter = 1),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
                 selectedColor: Color(0xff717171),
-                backgroundColor: Colors.transparent,
-                label: Container(
-                  margin: EdgeInsets.only(left: 10, right: 10, top: 10, bottom: 10),
-                  child: Center(
+                backgroundColor: Color(0xffC7C9CF),
+                label: Center(
+                  child: Padding(
+                    padding: const EdgeInsets.only(bottom: 15),
                     child: Text(
                       "Accepted",
                       style: TextStyle(
-                        fontSize: 14, 
+                        fontSize: 14,
                         fontWeight: FontWeight.bold,
-                        color: Colors.black
+                        color: Colors.black,
                       ),
                     ),
                   ),
                 ),
               ),
-              SizedBox(width: 10),
-              FilterChip(
-                selected: selectedFilter == 2, 
+            ),
+            SizedBox(width: 10),
+            Expanded(
+              child: ChoiceChip(
+                selected: selectedFilter == 2,
                 onSelected: (bool selected) => setState(() => selectedFilter = 2),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
                 selectedColor: Color(0xff717171),
-                backgroundColor: Colors.transparent,
-                label: Container(
-                  margin: EdgeInsets.only(left: 10, right: 10, top: 10, bottom: 10),
-                  child: Center(
+                backgroundColor: Color(0xffC7C9CF),
+                label: Center(
+                  child: Padding(
+                    padding: const EdgeInsets.only(bottom: 15),
                     child: Text(
                       "Completed",
                       style: TextStyle(
-                        fontSize: 14, 
+                        fontSize: 14,
                         fontWeight: FontWeight.bold,
-                        color: Colors.black
+                        color: Colors.black,
                       ),
                     ),
                   ),
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
