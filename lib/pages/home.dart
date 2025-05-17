@@ -2,8 +2,6 @@ import 'package:pt_best/models/requests.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
-
-
 class History extends StatefulWidget {
   const History({super.key});
 
@@ -12,19 +10,20 @@ class History extends StatefulWidget {
 }
 
 class _HistoryState extends State<History> {
-  List<MixModel> requests = [];
+  List<MixModelRequests> requests = [];
 
   void _getInitialInfo() {
-    requests = MixModel.getMix();
+    requests = MixModelRequests.getMix();
   }
 
   int myIndex = 2;
   int selectedFilter = 0;
 
-  @override  
+  @override
   Widget build(BuildContext context) {
     _getInitialInfo();
-    return Scaffold(// optional for better contrast
+    return Scaffold(
+      // optional for better contrast
       bottomNavigationBar: navigationBar(),
       body: ListView(
         children: [
@@ -45,7 +44,7 @@ class _HistoryState extends State<History> {
       children: [
         ListView.separated(
           shrinkWrap: true,
-          physics: NeverScrollableScrollPhysics(), 
+          physics: NeverScrollableScrollPhysics(),
           itemCount: requests.length,
           separatorBuilder: (context, index) => SizedBox(height: 25),
           itemBuilder: (context, index) {
@@ -85,14 +84,15 @@ class _HistoryState extends State<History> {
                               ),
                             ),
                           ),
-                          SizedBox(width: 15,),
+                          SizedBox(
+                            width: 15,
+                          ),
                           Text(
-                            requests[index].orderName, 
+                            requests[index].orderName,
                             style: const TextStyle(
-                              color: Colors.black, 
-                              fontSize: 12,
-                              fontWeight: FontWeight.w400
-                            ),
+                                color: Colors.black,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w400),
                           )
                         ],
                       ),
@@ -101,16 +101,14 @@ class _HistoryState extends State<History> {
                         width: 105,
                         height: 30,
                         decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(20), 
+                          borderRadius: BorderRadius.circular(20),
                           color: requests[index].statusColor,
                         ),
                         child: Center(
                           child: Text(
-                            requests[index].status, 
+                            requests[index].status,
                             style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold
-                            ),
+                                fontSize: 12, fontWeight: FontWeight.bold),
                           ),
                         ),
                       )
@@ -123,16 +121,16 @@ class _HistoryState extends State<History> {
                       Padding(
                         padding: const EdgeInsets.only(left: 20),
                         child: Text(
-                          requests[index].price, 
+                          requests[index].price,
                           style: TextStyle(
-                            fontSize: 12, 
-                            fontWeight: FontWeight.bold, 
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
                             color: Colors.black,
                           ),
                         ),
                       ),
                       Padding(
-                        padding: const EdgeInsets.only(right:20),
+                        padding: const EdgeInsets.only(right: 20),
                         child: SvgPicture.asset(
                           'assets/icons/info.svg',
                           width: 30,
@@ -154,8 +152,8 @@ class _HistoryState extends State<History> {
                             child: Text(
                               'Posted By:',
                               style: TextStyle(
-                                fontSize: 10, 
-                                fontWeight: FontWeight.w400, 
+                                fontSize: 10,
+                                fontWeight: FontWeight.w400,
                                 color: Color(0xff595B5C),
                               ),
                             ),
@@ -163,12 +161,11 @@ class _HistoryState extends State<History> {
                           Padding(
                             padding: const EdgeInsets.only(left: 20),
                             child: Text(
-                              requests[index].soliciter, 
+                              requests[index].soliciter,
                               style: TextStyle(
-                                color: Colors.black, 
-                                fontSize: 12, 
-                                fontWeight: FontWeight.w400
-                              ),
+                                  color: Colors.black,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w400),
                             ),
                           ),
                         ],
@@ -182,8 +179,8 @@ class _HistoryState extends State<History> {
                             child: Text(
                               'Expected On:',
                               style: TextStyle(
-                                fontSize: 10, 
-                                fontWeight: FontWeight.w400, 
+                                fontSize: 10,
+                                fontWeight: FontWeight.w400,
                                 color: Color(0xff595B5C),
                               ),
                             ),
@@ -193,8 +190,8 @@ class _HistoryState extends State<History> {
                             child: Text(
                               requests[index].date,
                               style: TextStyle(
-                                fontSize: 12, 
-                                fontWeight: FontWeight.bold, 
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
                                 color: Colors.black,
                               ),
                             ),
@@ -204,8 +201,8 @@ class _HistoryState extends State<History> {
                             child: Text(
                               "(in " + requests[index].duration + ")",
                               style: TextStyle(
-                                fontSize: 10, 
-                                fontWeight: FontWeight.w400, 
+                                fontSize: 10,
+                                fontWeight: FontWeight.w400,
                                 color: Colors.black,
                               ),
                             ),
@@ -240,69 +237,72 @@ class _HistoryState extends State<History> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               FilterChip(
-                selected: selectedFilter == 0, 
-                onSelected: (bool selected) => setState(() => selectedFilter = 0),
+                selected: selectedFilter == 0,
+                onSelected: (bool selected) =>
+                    setState(() => selectedFilter = 0),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
                 selectedColor: Color(0xff717171),
                 backgroundColor: Colors.transparent,
                 label: Container(
-                  margin: EdgeInsets.only(left: 10, right: 10, top: 10, bottom: 10),
+                  margin:
+                      EdgeInsets.only(left: 10, right: 10, top: 10, bottom: 10),
                   child: Center(
                     child: Text(
                       "Requests",
                       style: TextStyle(
-                        fontSize: 14, 
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black
-                      ),
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black),
                     ),
                   ),
                 ),
               ),
               SizedBox(width: 10),
               FilterChip(
-                selected: selectedFilter == 1, 
-                onSelected: (bool selected) => setState(() => selectedFilter = 1),
+                selected: selectedFilter == 1,
+                onSelected: (bool selected) =>
+                    setState(() => selectedFilter = 1),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
                 selectedColor: Color(0xff717171),
                 backgroundColor: Colors.transparent,
                 label: Container(
-                  margin: EdgeInsets.only(left: 10, right: 10, top: 10, bottom: 10),
+                  margin:
+                      EdgeInsets.only(left: 10, right: 10, top: 10, bottom: 10),
                   child: Center(
                     child: Text(
                       "Accepted",
                       style: TextStyle(
-                        fontSize: 14, 
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black
-                      ),
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black),
                     ),
                   ),
                 ),
               ),
               SizedBox(width: 10),
               FilterChip(
-                selected: selectedFilter == 2, 
-                onSelected: (bool selected) => setState(() => selectedFilter = 2),
+                selected: selectedFilter == 2,
+                onSelected: (bool selected) =>
+                    setState(() => selectedFilter = 2),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
                 selectedColor: Color(0xff717171),
                 backgroundColor: Colors.transparent,
                 label: Container(
-                  margin: EdgeInsets.only(left: 10, right: 10, top: 10, bottom: 10),
+                  margin:
+                      EdgeInsets.only(left: 10, right: 10, top: 10, bottom: 10),
                   child: Center(
                     child: Text(
                       "Completed",
                       style: TextStyle(
-                        fontSize: 14, 
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black
-                      ),
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black),
                     ),
                   ),
                 ),
@@ -319,11 +319,11 @@ class _HistoryState extends State<History> {
       alignment: Alignment.topCenter,
       child: Container(
         margin: const EdgeInsets.only(top: 40),
-        height: 206, 
-        width: 362, 
+        height: 206,
+        width: 362,
         padding: const EdgeInsets.symmetric(horizontal: 20),
         decoration: BoxDecoration(
-          color: Colors.black, 
+          color: Colors.black,
           borderRadius: BorderRadius.circular(5),
         ),
         child: Column(
@@ -331,81 +331,76 @@ class _HistoryState extends State<History> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Container(
-                  width: 56, 
-                  height: 56,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Color(0xff343738),
-                  ),
-                  child: Center(
-                    child: SvgPicture.asset(
-                      'assets/icons/profile.svg',
-                      width: 25,
-                      height: 25,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Container(
+                    width: 56,
+                    height: 56,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Color(0xff343738),
+                    ),
+                    child: Center(
+                      child: SvgPicture.asset(
+                        'assets/icons/profile.svg',
+                        width: 25,
+                        height: 25,
+                      ),
                     ),
                   ),
-                ),
-                Container(
-                  width: 56, 
-                  height: 56, 
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Color(0xff343738),
-                  ),
-                  child: Center(
-                    child: SvgPicture.asset(
-                      'assets/icons/notifications.svg',
-                      width: 25, 
-                      height: 25, 
+                  Container(
+                    width: 56,
+                    height: 56,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Color(0xff343738),
+                    ),
+                    child: Center(
+                      child: SvgPicture.asset(
+                        'assets/icons/notifications.svg',
+                        width: 25,
+                        height: 25,
+                      ),
                     ),
                   ),
-                ),
-              ]
-            ),
+                ]),
             Padding(
               padding: const EdgeInsets.only(right: 100, top: 10),
               child: Text(
                 'Search Orders',
                 style: TextStyle(
-                  color: Colors.white, 
-                  fontSize: 30,
-                  fontWeight: FontWeight.w100
-                ),
+                    color: Colors.white,
+                    fontSize: 30,
+                    fontWeight: FontWeight.w100),
               ),
             ),
-            Padding( 
+            Padding(
               padding: const EdgeInsets.symmetric(vertical: 20),
               child: SizedBox(
                 width: 320,
                 height: 45,
                 child: Container(
-                  padding: EdgeInsets.only(right:18),
+                  padding: EdgeInsets.only(right: 18),
                   decoration: BoxDecoration(
                     color: Color(0xffD9D9D9),
                     borderRadius: BorderRadius.circular(15),
                   ),
                   child: TextField(
                     decoration: InputDecoration(
-                      filled: true, 
+                      filled: true,
                       fillColor: Color(0xffD9D9D9),
                       contentPadding: EdgeInsets.all(15),
                       hintText: 'Search for works',
-                      hintStyle: TextStyle(
-                        color: Color(0xffADADAD), 
-                        fontSize: 14
-                      ),
+                      hintStyle:
+                          TextStyle(color: Color(0xffADADAD), fontSize: 14),
                       prefixIcon: Padding(
-                        padding: const EdgeInsets.all(12), 
+                        padding: const EdgeInsets.all(12),
                         child: SvgPicture.asset('assets/icons/search.svg'),
                       ),
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(15),
-                        borderSide: BorderSide.none
-                      ),
+                          borderRadius: BorderRadius.circular(15),
+                          borderSide: BorderSide.none),
                     ),
                   ),
                 ),
@@ -419,87 +414,86 @@ class _HistoryState extends State<History> {
 
   Padding navigationBar() {
     return Padding(
-    padding: const EdgeInsets.all(16.0),
-    child: Container(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-      decoration: BoxDecoration(
-        color: Color(0xff868686),
-        borderRadius: BorderRadius.circular(30),
+      padding: const EdgeInsets.all(16.0),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+        decoration: BoxDecoration(
+          color: Color(0xff868686),
+          borderRadius: BorderRadius.circular(30),
+        ),
+        child: BottomNavigationBar(
+          currentIndex: myIndex,
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          type: BottomNavigationBarType.fixed,
+          selectedItemColor: Colors.black,
+          unselectedItemColor: Color(0xffC6C9CF),
+          onTap: (index) {
+            setState(() {
+              myIndex = index;
+            });
+          },
+          items: [
+            BottomNavigationBarItem(
+              icon: Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: myIndex == 0 ? Colors.black : Color(0xffC6C9CF),
+                ),
+                child: Center(
+                  child: SvgPicture.asset(
+                    'assets/icons/history.svg',
+                    width: 24,
+                    height: 24,
+                    color: myIndex == 0 ? Colors.white : Colors.black,
+                  ),
+                ),
+              ),
+              label: 'Home',
+            ),
+            BottomNavigationBarItem(
+              icon: Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: myIndex == 1 ? Colors.black : Color(0xffC6C9CF),
+                ),
+                child: Center(
+                  child: SvgPicture.asset(
+                    'assets/icons/certification.svg',
+                    width: 24,
+                    height: 24,
+                    color: myIndex == 1 ? Colors.white : Colors.black,
+                  ),
+                ),
+              ),
+              label: 'Certificates',
+            ),
+            BottomNavigationBarItem(
+              icon: Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: myIndex == 2 ? Colors.black : Color(0xffC6C9CF),
+                ),
+                child: Center(
+                  child: SvgPicture.asset(
+                    'assets/icons/orders.svg',
+                    width: 24,
+                    height: 24,
+                    color: myIndex == 2 ? Colors.white : Colors.black,
+                  ),
+                ),
+              ),
+              label: 'Orders',
+            ),
+          ],
+        ),
       ),
-      child: BottomNavigationBar(
-        currentIndex: myIndex,
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        type: BottomNavigationBarType.fixed,
-        selectedItemColor: Colors.black,
-        unselectedItemColor: Color(0xffC6C9CF),
-        onTap: (index) {
-          setState(() {
-            myIndex = index;
-          });
-        },
-        items: [
-          BottomNavigationBarItem(
-            icon: Container(
-              width: 40, 
-              height: 40, 
-              decoration: BoxDecoration(
-                shape: BoxShape.circle, 
-                color: myIndex == 0 ? Colors.black : Color(0xffC6C9CF), 
-              ),
-              child: Center(
-                child: SvgPicture.asset(
-                  'assets/icons/history.svg',
-                  width: 24, 
-                  height: 24, 
-                  color: myIndex == 0 ? Colors.white : Colors.black,
-                ),
-              ),
-            ),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Container(
-              width: 40, 
-              height: 40, 
-              decoration: BoxDecoration(
-                shape: BoxShape.circle, 
-                color: myIndex == 1 ? Colors.black : Color(0xffC6C9CF), 
-              ),
-              child: Center(
-                child: SvgPicture.asset(
-                  'assets/icons/certification.svg',
-                  width: 24, 
-                  height: 24, 
-                  color: myIndex == 1 ? Colors.white : Colors.black,
-                ),
-              ),
-            ),
-            label: 'Certificates',
-          ),
-          BottomNavigationBarItem(
-            icon: Container(
-              width: 40, 
-              height: 40, 
-              decoration: BoxDecoration(
-                shape: BoxShape.circle, 
-                color: myIndex == 2 ? Colors.black : Color(0xffC6C9CF), 
-              ),
-              child: Center(
-                child: SvgPicture.asset(
-                  'assets/icons/orders.svg',
-                  width: 24, 
-                  height: 24, 
-                  color: myIndex == 2 ? Colors.white : Colors.black,
-                ),
-              ),
-            ),
-            label: 'Orders',
-          ),
-        ],
-      ),
-    ),
-  );
+    );
   }
 }
-
