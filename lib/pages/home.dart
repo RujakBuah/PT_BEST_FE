@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 
-
 class History extends StatefulWidget {
   const History({super.key});
 
@@ -18,14 +17,13 @@ class _HistoryState extends State<History> {
     requests = MixModel.getMix();
   }
 
-  int myIndex = 2;
+
   int selectedFilter = 0;
 
   @override  
   Widget build(BuildContext context) {
     _getInitialInfo();
     return Scaffold(// optional for better contrast
-      bottomNavigationBar: navigationBar(),
       body: ListView(
         children: [
           searchBox(),
@@ -230,7 +228,7 @@ class _HistoryState extends State<History> {
         height: 40,
         decoration: BoxDecoration(
           color: Color(0xffC7C9CF),
-          borderRadius: BorderRadius.circular(5),
+          borderRadius: BorderRadius.circular(15),
         ),
         child: Row(
           children: [
@@ -239,7 +237,7 @@ class _HistoryState extends State<History> {
                 selected: selectedFilter == 0,
                 onSelected: (bool selected) => setState(() => selectedFilter = 0),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(15),
                 ),
                 selectedColor: Color(0xff717171),
                 backgroundColor: Color(0xffC7C9CF),
@@ -258,13 +256,12 @@ class _HistoryState extends State<History> {
                 ),
               ),
             ),
-            SizedBox(width: 10),
             Expanded(
               child: ChoiceChip(
                 selected: selectedFilter == 1,
                 onSelected: (bool selected) => setState(() => selectedFilter = 1),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(15),
                 ),
                 selectedColor: Color(0xff717171),
                 backgroundColor: Color(0xffC7C9CF),
@@ -283,13 +280,12 @@ class _HistoryState extends State<History> {
                 ),
               ),
             ),
-            SizedBox(width: 10),
             Expanded(
               child: ChoiceChip(
                 selected: selectedFilter == 2,
                 onSelected: (bool selected) => setState(() => selectedFilter = 2),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(15),
                 ),
                 selectedColor: Color(0xff717171),
                 backgroundColor: Color(0xffC7C9CF),
@@ -416,90 +412,4 @@ class _HistoryState extends State<History> {
       ),
     );
   }
-
-  Padding navigationBar() {
-    return Padding(
-    padding: const EdgeInsets.all(16.0),
-    child: Container(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-      decoration: BoxDecoration(
-        color: Color(0xff868686),
-        borderRadius: BorderRadius.circular(30),
-      ),
-      child: BottomNavigationBar(
-        currentIndex: myIndex,
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        type: BottomNavigationBarType.fixed,
-        selectedItemColor: Colors.black,
-        unselectedItemColor: Color(0xffC6C9CF),
-        onTap: (index) {
-          setState(() {
-            myIndex = index;
-          });
-        },
-        items: [
-          BottomNavigationBarItem(
-            icon: Container(
-              width: 40, 
-              height: 40, 
-              decoration: BoxDecoration(
-                shape: BoxShape.circle, 
-                color: myIndex == 0 ? Colors.black : Color(0xffC6C9CF), 
-              ),
-              child: Center(
-                child: SvgPicture.asset(
-                  'assets/icons/history.svg',
-                  width: 24, 
-                  height: 24, 
-                  color: myIndex == 0 ? Colors.white : Colors.black,
-                ),
-              ),
-            ),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Container(
-              width: 40, 
-              height: 40, 
-              decoration: BoxDecoration(
-                shape: BoxShape.circle, 
-                color: myIndex == 1 ? Colors.black : Color(0xffC6C9CF), 
-              ),
-              child: Center(
-                child: SvgPicture.asset(
-                  'assets/icons/certification.svg',
-                  width: 24, 
-                  height: 24, 
-                  color: myIndex == 1 ? Colors.white : Colors.black,
-                ),
-              ),
-            ),
-            label: 'Certificates',
-          ),
-          BottomNavigationBarItem(
-            icon: Container(
-              width: 40, 
-              height: 40, 
-              decoration: BoxDecoration(
-                shape: BoxShape.circle, 
-                color: myIndex == 2 ? Colors.black : Color(0xffC6C9CF), 
-              ),
-              child: Center(
-                child: SvgPicture.asset(
-                  'assets/icons/orders.svg',
-                  width: 24, 
-                  height: 24, 
-                  color: myIndex == 2 ? Colors.white : Colors.black,
-                ),
-              ),
-            ),
-            label: 'Orders',
-          ),
-        ],
-      ),
-    ),
-  );
-  }
 }
-
