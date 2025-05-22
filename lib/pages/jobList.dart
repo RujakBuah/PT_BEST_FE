@@ -48,7 +48,7 @@ class _jobListState extends State<jobList> {
           child: Padding(
             padding: const EdgeInsets.all(16),
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -89,7 +89,154 @@ class _jobListState extends State<jobList> {
                     ),
                   ],
                 ),
-                // You can add more rows/info here as needed
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        SvgPicture.asset(
+                          'assets/icons/truck.svg',
+                          width: 40,
+                          height: 32,
+                        ),
+                        Text(
+                          'Delivery',
+                          style: TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w400,
+                            color: Colors.black
+                          ),
+                        )
+                      ],
+                    ),
+                    SizedBox(width: 15),
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(left: 15),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Pickup:',
+                                style: TextStyle(
+                                  fontSize: 8,
+                                  fontWeight: FontWeight.w400,
+                                  color: Color(0xff343738),
+                                ),
+                              ),
+                              Text(
+                                jblists[index].address,
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w500,
+                                  color: Colors.black
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Dropoff:',
+                              style: TextStyle(
+                                fontSize: 8,
+                                fontWeight: FontWeight.w400,
+                                color: Color(0xff343738),
+                              ),
+                            ),
+                            Text(
+                              jblists[index].dropAt,
+                              style: TextStyle(
+                                fontSize: 10,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.black
+                              ),
+                            )
+                          ],
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(right: 138),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Complete by:',
+                                style: TextStyle(
+                                  fontSize: 8,
+                                  fontWeight: FontWeight.w400,
+                                  color: Color(0xff343738),
+                                ),
+                              ),
+                              Text(
+                                jblists[index].deadline,
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w500,
+                                  color: Colors.black
+                                ),
+                              )
+                            ],
+                          ),
+                        )
+                      ],
+                    )
+                  ],
+                ),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 250),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Text(
+                          'offer:',
+                          style: TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w500,
+                            color: Color(0xff595B5C)
+                          ),
+                        ),
+                        Text(
+                          jblists[index].priceOffer,
+                          style: TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w500,
+                            color: Color(0xff595B5C)
+                          ),
+                        ),
+                        SafeArea(
+                          child: Container(
+                            width: 80,
+                            height: 32,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(35),
+                              color: Color(0xff35883B),
+                            ),
+                            child: Center(
+                              child: Text(
+                                'Apply',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.black
+                                ),
+                              ),
+                            ),
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+                )
               ],
             ),
           ),
