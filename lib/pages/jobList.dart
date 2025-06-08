@@ -40,7 +40,7 @@ class _jobListState extends State<jobList> {
       itemBuilder: (context, index) {
         return Container(
           margin: EdgeInsets.symmetric(horizontal: 20),
-          height: 198,
+          height: 207,
           decoration: BoxDecoration(
             color: Color(0xffD9D9D9),
             borderRadius: BorderRadius.circular(10),

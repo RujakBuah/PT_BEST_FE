@@ -1,10 +1,15 @@
-// lib/pages/main_page.dart
-
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+
+// Your existing pages
 import 'package:pt_best/pages/home.dart';
 import 'package:pt_best/pages/jobList.dart';
 import 'package:pt_best/pages/skillDev.dart';
+
+// New pages
+import 'package:pt_best/pages/mainEntry.dart';
+import 'package:pt_best/pages/login.dart';
+import 'package:pt_best/pages/register.dart';
 
 void main() {
   runApp(const MyApp());
@@ -20,9 +25,15 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         fontFamily: 'Inter',
         scaffoldBackgroundColor: const Color(0xff868686),
-        chipTheme: ChipThemeData(iconTheme: IconThemeData(), showCheckmark: false)
+        chipTheme: ChipThemeData(iconTheme: IconThemeData(), showCheckmark: false),
       ),
-      home: MainPage(),
+      initialRoute: '/',
+      routes: {
+        '/': (context) => const MainEntryPage(), // <- Entry page
+        '/login': (context) => const LoginPage(),
+        '/register': (context) => const RegisterPage(),
+        '/main': (context) => const MainPage(), // <- Your actual main app with bottom nav
+      },
     );
   }
 }
