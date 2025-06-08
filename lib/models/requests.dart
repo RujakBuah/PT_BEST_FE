@@ -36,18 +36,6 @@ class MixModel {
 
     requests.add(
       MixModel(
-        orderName: 'Order #21',
-        status: 'Accepted',
-        soliciter: 'Hoyoverse',
-        duration: '7 Days',
-        date: '30/10/2025',
-        price: 'Rp 25,000',
-        statusColor: Color(0xff56D47A)
-      )
-    );
-
-    requests.add(
-      MixModel(
         orderName: 'Order #227',
         status: 'Rejected',
         soliciter: 'Moonton',
