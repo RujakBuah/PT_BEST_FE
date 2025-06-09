@@ -1,6 +1,7 @@
 import 'package:pt_best/models/requests.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:pt_best/models/accepted.dart';
 
 
 class History extends StatefulWidget {
@@ -12,9 +13,11 @@ class History extends StatefulWidget {
 
 class _HistoryState extends State<History> {
   List<MixModel> requests = [];
+  List<AccModel> accepted = [];
 
   void _getInitialInfo() {
     requests = MixModel.getMix();
+    accepted = AccModel.getAcc();
   }
 
 
@@ -44,7 +47,9 @@ class _HistoryState extends State<History> {
         ListView.separated(
           shrinkWrap: true,
           physics: NeverScrollableScrollPhysics(), 
-          itemCount: requests.length,
+          itemCount: selectedFilter == 0
+            ? requests.length
+            : accepted.length,
           separatorBuilder: (context, index) => SizedBox(height: 25),
           itemBuilder: (context, index) {
             return Container(
@@ -83,15 +88,27 @@ class _HistoryState extends State<History> {
                               ),
                             ),
                           ),
-                          SizedBox(width: 15,),
-                          Text(
-                            requests[index].orderName, 
-                            style: const TextStyle(
-                              color: Colors.black, 
-                              fontSize: 12,
-                              fontWeight: FontWeight.w400
-                            ),
-                          )
+                          SizedBox(width: 15),
+                          selectedFilter == 0
+                              ? Text(
+                                  requests[index].orderName,
+                                  style: const TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                )
+                              : SizedBox.shrink(),
+                          selectedFilter == 1
+                              ? Text(
+                                  accepted[index].orderName,
+                                  style: const TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                )
+                              : SizedBox.shrink(),
                         ],
                       ),
                       Container(
@@ -99,17 +116,29 @@ class _HistoryState extends State<History> {
                         width: 105,
                         height: 30,
                         decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(20), 
-                          color: requests[index].statusColor,
+                          borderRadius: BorderRadius.circular(20),
+                          color: selectedFilter == 0
+                              ? requests[index].statusColor
+                              : accepted[index].statusColor,
                         ),
                         child: Center(
-                          child: Text(
-                            requests[index].status, 
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold
-                            ),
-                          ),
+                          child: selectedFilter == 0
+                              ? Text(
+                                  requests[index].status,
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                )
+                              : selectedFilter == 1
+                                  ? Text(
+                                      accepted[index].status,
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    )
+                                  : SizedBox.shrink(),
                         ),
                       )
                     ],
@@ -120,14 +149,26 @@ class _HistoryState extends State<History> {
                     children: [
                       Padding(
                         padding: const EdgeInsets.only(left: 20),
-                        child: Text(
-                          requests[index].price, 
-                          style: TextStyle(
-                            fontSize: 12, 
-                            fontWeight: FontWeight.bold, 
-                            color: Colors.black,
-                          ),
-                        ),
+                        child: 
+                        selectedFilter == 0
+                        ?  Text(
+                            requests[index].price, 
+                            style: TextStyle(
+                              fontSize: 12, 
+                              fontWeight: FontWeight.bold, 
+                              color: Colors.black,
+                            ),
+                          )
+                        : selectedFilter == 1
+                        ?  Text(
+                            accepted[index].price, 
+                            style: TextStyle(
+                              fontSize: 12, 
+                              fontWeight: FontWeight.bold, 
+                              color: Colors.black,
+                            ),
+                          )
+                        : SizedBox.shrink(),
                       ),
                       Padding(
                         padding: const EdgeInsets.only(right:20),
@@ -160,14 +201,26 @@ class _HistoryState extends State<History> {
                           ),
                           Padding(
                             padding: const EdgeInsets.only(left: 20),
-                            child: Text(
-                              requests[index].soliciter, 
-                              style: TextStyle(
-                                color: Colors.black, 
-                                fontSize: 12, 
-                                fontWeight: FontWeight.w400
-                              ),
-                            ),
+                            child: 
+                            selectedFilter == 0
+                            ?  Text(
+                                requests[index].soliciter, 
+                                style: TextStyle(
+                                  color: Colors.black, 
+                                  fontSize: 12, 
+                                  fontWeight: FontWeight.w400
+                                ),
+                              )
+                            : selectedFilter == 1
+                            ?  Text(
+                                accepted[index].soliciter, 
+                                style: TextStyle(
+                                  color: Colors.black, 
+                                  fontSize: 12, 
+                                  fontWeight: FontWeight.w400
+                                ),
+                              )
+                            : SizedBox.shrink(),  
                           ),
                         ],
                       ),
@@ -188,25 +241,49 @@ class _HistoryState extends State<History> {
                           ),
                           Padding(
                             padding: const EdgeInsets.only(right: 20),
-                            child: Text(
-                              requests[index].date,
-                              style: TextStyle(
-                                fontSize: 12, 
-                                fontWeight: FontWeight.bold, 
-                                color: Colors.black,
-                              ),
-                            ),
+                            child: 
+                            selectedFilter == 0
+                            ?  Text(
+                                requests[index].date,
+                                style: TextStyle(
+                                  fontSize: 12, 
+                                  fontWeight: FontWeight.bold, 
+                                  color: Colors.black,
+                                ),
+                              )
+                            : selectedFilter == 1
+                            ?  Text(
+                                accepted[index].date,
+                                style: TextStyle(
+                                  fontSize: 12, 
+                                  fontWeight: FontWeight.bold, 
+                                  color: Colors.black,
+                                ),
+                              )
+                            : SizedBox.shrink(),  
                           ),
                           Padding(
                             padding: const EdgeInsets.only(right: 20),
-                            child: Text(
-                              "(in " + requests[index].duration + ")",
-                              style: TextStyle(
-                                fontSize: 10, 
-                                fontWeight: FontWeight.w400, 
-                                color: Colors.black,
-                              ),
-                            ),
+                            child: 
+                            selectedFilter == 0
+                            ?  Text(
+                                "(in " + requests[index].duration + ")",
+                                style: TextStyle(
+                                  fontSize: 10, 
+                                  fontWeight: FontWeight.w400, 
+                                  color: Colors.black,
+                                ),
+                              )
+                            :  selectedFilter == 1
+                            ?  Text(
+                                "(in " + accepted[index].duration + ")",
+                                style: TextStyle(
+                                  fontSize: 10, 
+                                  fontWeight: FontWeight.w400, 
+                                  color: Colors.black,
+                                ),
+                              )
+                            : SizedBox.shrink()  
                           ),
                         ],
                       )
