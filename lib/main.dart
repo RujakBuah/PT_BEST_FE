@@ -19,7 +19,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         fontFamily: 'Inter',
-        scaffoldBackgroundColor: const Color(0xff868686),
+        scaffoldBackgroundColor: const Color(0xffAFAFAF),
         chipTheme: ChipThemeData(iconTheme: IconThemeData(), showCheckmark: false)
       ),
       home: MainPage(),
@@ -39,7 +39,7 @@ class _MainPageState extends State<MainPage> {
 
   final List<Widget> pages = [
     jobList(),
-    skillDev(),
+    skillPage(),
     History(),
   ];
 
