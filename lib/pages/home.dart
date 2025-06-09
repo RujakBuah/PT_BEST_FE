@@ -1,301 +1,206 @@
-import 'package:pt_best/models/requests.dart';
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:pt_best/models/accepted.dart';
-
+import 'package:pt_best/models/order.dart';
+import 'package:pt_best/services/api_service.dart';
 
 class History extends StatefulWidget {
-  const History({super.key});
+  final Function({bool switchToOrders}) onJobResigned;
+  const History({Key? key, required this.onJobResigned}) : super(key: key);
 
   @override
-  State<History> createState() => _HistoryState();
+  State<History> createState() => HistoryState();
 }
 
-class _HistoryState extends State<History> {
-  List<MixModel> requests = [];
-  List<AccModel> accepted = [];
+// State class name is now PUBLIC (no underscore)
+class HistoryState extends State<History> {
+  final ApiService apiService = ApiService();
+  List<Order> _allOrders = [];
+  List<Order> _requests = [];
+  List<Order> _accepted = [];
+  List<Order> _completed = [];
+  bool _isLoading = true;
+  int _selectedFilter = 0;
 
-  void _getInitialInfo() {
-    requests = MixModel.getMix();
-    accepted = AccModel.getAcc();
+  @override
+  void initState() {
+    super.initState();
+    fetchOrders();
   }
 
+  // Method name is now PUBLIC (no underscore)
+  Future<void> fetchOrders() async {
+    if (!mounted) return;
+    setState(() {
+      _isLoading = true;
+    });
+    try {
+      final orders = await apiService.fetchOrders();
+      _allOrders = orders;
+      _filterOrders();
+      _allOrders.where((o) => o.status == 'Pending').forEach(_startAcceptanceTimer);
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to fetch orders: ${e.toString()}')),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
 
-  int selectedFilter = 0;
+  void _filterOrders() {
+    if (!mounted) return;
+    setState(() {
+      _requests = _allOrders.where((o) => o.status == 'Pending').toList();
+      _accepted = _allOrders.where((o) => o.status == 'Accepted').toList();
+      _completed = _allOrders.where((o) => o.status == 'Completed').toList();
+    });
+  }
 
-  @override  
+  void _startAcceptanceTimer(Order order) {
+    final timeSinceCreation = DateTime.now().millisecondsSinceEpoch / 1000 - order.createdAt;
+    final remainingTime = 30 - timeSinceCreation;
+    if (remainingTime > 0) {
+      Timer(Duration(seconds: remainingTime.toInt()), () {
+        if (mounted && order.status == 'Pending') {
+          _updateOrderStatus(order.orderId);
+        }
+      });
+    } else if (order.status == 'Pending') {
+      WidgetsBinding.instance.addPostFrameCallback((_) => _updateOrderStatus(order.orderId));
+    }
+  }
+
+  Future<void> _updateOrderStatus(String orderId) async {
+    try {
+      await apiService.updateOrderStatus(orderId);
+      await fetchOrders();
+    } catch (e) {
+      if(mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to update status: ${e.toString()}')));
+    }
+  }
+
+  Future<void> _resignFromJob(String orderId) async {
+    try {
+      await apiService.resignJob(orderId);
+      widget.onJobResigned(switchToOrders: false);
+    } catch(e) {
+      if(mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to resign: ${e.toString()}')));
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    _getInitialInfo();
-    return Scaffold(// optional for better contrast
-      body: ListView(
+    return Scaffold(
+      body: RefreshIndicator(
+        onRefresh: fetchOrders,
+        child: ListView(
+          children: [
+            searchBox(),
+            const SizedBox(height: 15),
+            selectBar(),
+            const SizedBox(height: 15),
+            _isLoading ? const Center(child: CircularProgressIndicator()) : requestList(),
+            const SizedBox(height: 15),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget requestList() {
+    List<Order> currentList;
+    switch (_selectedFilter) {
+      case 0: currentList = _requests; break;
+      case 1: currentList = _accepted; break;
+      case 2: currentList = _completed; break;
+      default: currentList = [];
+    }
+    if (currentList.isEmpty) {
+      return const Center(child: Padding(padding: EdgeInsets.all(32.0), child: Text('No orders in this category.')));
+    }
+    return ListView.separated(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: currentList.length,
+      separatorBuilder: (context, index) => const SizedBox(height: 25),
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      itemBuilder: (context, index) {
+        final order = currentList[index];
+        return orderCard(order);
+      },
+    );
+  }
+
+  Widget orderCard(Order order) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(color: const Color(0xffD9D9D9), borderRadius: BorderRadius.circular(10)),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          searchBox(),
-          SizedBox(height: 15),
-          selectBar(),
-          SizedBox(height: 15),
-          requestList(),
-          SizedBox(height: 15),
+          Row(
+            children: [
+              Container(
+                width: 35, height: 35,
+                decoration: const BoxDecoration(shape: BoxShape.circle, color: Color(0xffF1F1F1)),
+                child: Center(child: SvgPicture.asset('assets/icons/box.svg', width: 18, height: 18)),
+              ),
+              const SizedBox(width: 15),
+              Expanded(child: Text(order.jobDetails.jobGiver, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w400))),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(borderRadius: BorderRadius.circular(20), color: _getStatusColor(order.status)),
+                child: Text(order.status, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.black)),
+              )
+            ],
+          ),
+          Divider(height: 20, color: Colors.grey[600]),
+          Text('Price: ${order.jobDetails.priceOffer}', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+          const SizedBox(height: 8),
+          Text('Pickup: ${order.jobDetails.address}', style: const TextStyle(fontSize: 10)),
+          const SizedBox(height: 4),
+          Text('Dropoff: ${order.jobDetails.dropAt}', style: const TextStyle(fontSize: 10)),
+          const SizedBox(height: 10),
+          if (order.status == 'Accepted' || order.status == 'Pending')
+            Align(
+              alignment: Alignment.bottomRight,
+              child: Wrap(
+                spacing: 8.0,
+                runSpacing: 4.0,
+                alignment: WrapAlignment.end,
+                children: [
+                  if(order.status == 'Accepted')
+                  ElevatedButton(
+                      onPressed: () => _updateOrderStatus(order.orderId),
+                      child: const Text("Mark as Done"),
+                      style: ElevatedButton.styleFrom(backgroundColor: Colors.blue)),
+                  ElevatedButton(
+                    onPressed: () => _resignFromJob(order.orderId),
+                    child: const Text("Resign Job"),
+                    style: ElevatedButton.styleFrom(backgroundColor: Colors.red[400]),
+                  )
+                ],
+              ),
+            ),
         ],
       ),
     );
   }
 
-  Column requestList() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        ListView.separated(
-          shrinkWrap: true,
-          physics: NeverScrollableScrollPhysics(), 
-          itemCount: selectedFilter == 0
-            ? requests.length
-            : accepted.length,
-          separatorBuilder: (context, index) => SizedBox(height: 25),
-          itemBuilder: (context, index) {
-            return Container(
-              margin: EdgeInsets.only(left: 30, right: 30),
-              width: 315,
-              height: 175,
-              decoration: BoxDecoration(
-                color: Color(0xffD9D9D9),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Container(
-                            margin: EdgeInsets.only(left: 20),
-                            width: 35,
-                            height: 35,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: Color(0xffF1F1F1),
-                            ),
-                            child: Center(
-                              child: SvgPicture.asset(
-                                'assets/icons/box.svg',
-                                width: 18,
-                                height: 18,
-                              ),
-                            ),
-                          ),
-                          SizedBox(width: 15),
-                          selectedFilter == 0
-                              ? Text(
-                                  requests[index].orderName,
-                                  style: const TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w400,
-                                  ),
-                                )
-                              : SizedBox.shrink(),
-                          selectedFilter == 1
-                              ? Text(
-                                  accepted[index].orderName,
-                                  style: const TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w400,
-                                  ),
-                                )
-                              : SizedBox.shrink(),
-                        ],
-                      ),
-                      Container(
-                        margin: EdgeInsets.only(right: 20),
-                        width: 105,
-                        height: 30,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(20),
-                          color: selectedFilter == 0
-                              ? requests[index].statusColor
-                              : accepted[index].statusColor,
-                        ),
-                        child: Center(
-                          child: selectedFilter == 0
-                              ? Text(
-                                  requests[index].status,
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                )
-                              : selectedFilter == 1
-                                  ? Text(
-                                      accepted[index].status,
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    )
-                                  : SizedBox.shrink(),
-                        ),
-                      )
-                    ],
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(left: 20),
-                        child: 
-                        selectedFilter == 0
-                        ?  Text(
-                            requests[index].price, 
-                            style: TextStyle(
-                              fontSize: 12, 
-                              fontWeight: FontWeight.bold, 
-                              color: Colors.black,
-                            ),
-                          )
-                        : selectedFilter == 1
-                        ?  Text(
-                            accepted[index].price, 
-                            style: TextStyle(
-                              fontSize: 12, 
-                              fontWeight: FontWeight.bold, 
-                              color: Colors.black,
-                            ),
-                          )
-                        : SizedBox.shrink(),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(right:20),
-                        child: SvgPicture.asset(
-                          'assets/icons/info.svg',
-                          width: 30,
-                          height: 30,
-                        ),
-                      )
-                    ],
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.only(left: 20),
-                            child: Text(
-                              'Posted By:',
-                              style: TextStyle(
-                                fontSize: 10, 
-                                fontWeight: FontWeight.w400, 
-                                color: Color(0xff595B5C),
-                              ),
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(left: 20),
-                            child: 
-                            selectedFilter == 0
-                            ?  Text(
-                                requests[index].soliciter, 
-                                style: TextStyle(
-                                  color: Colors.black, 
-                                  fontSize: 12, 
-                                  fontWeight: FontWeight.w400
-                                ),
-                              )
-                            : selectedFilter == 1
-                            ?  Text(
-                                accepted[index].soliciter, 
-                                style: TextStyle(
-                                  color: Colors.black, 
-                                  fontSize: 12, 
-                                  fontWeight: FontWeight.w400
-                                ),
-                              )
-                            : SizedBox.shrink(),  
-                          ),
-                        ],
-                      ),
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.only(right: 20),
-                            child: Text(
-                              'Expected On:',
-                              style: TextStyle(
-                                fontSize: 10, 
-                                fontWeight: FontWeight.w400, 
-                                color: Color(0xff595B5C),
-                              ),
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(right: 20),
-                            child: 
-                            selectedFilter == 0
-                            ?  Text(
-                                requests[index].date,
-                                style: TextStyle(
-                                  fontSize: 12, 
-                                  fontWeight: FontWeight.bold, 
-                                  color: Colors.black,
-                                ),
-                              )
-                            : selectedFilter == 1
-                            ?  Text(
-                                accepted[index].date,
-                                style: TextStyle(
-                                  fontSize: 12, 
-                                  fontWeight: FontWeight.bold, 
-                                  color: Colors.black,
-                                ),
-                              )
-                            : SizedBox.shrink(),  
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(right: 20),
-                            child: 
-                            selectedFilter == 0
-                            ?  Text(
-                                "(in " + requests[index].duration + ")",
-                                style: TextStyle(
-                                  fontSize: 10, 
-                                  fontWeight: FontWeight.w400, 
-                                  color: Colors.black,
-                                ),
-                              )
-                            :  selectedFilter == 1
-                            ?  Text(
-                                "(in " + accepted[index].duration + ")",
-                                style: TextStyle(
-                                  fontSize: 10, 
-                                  fontWeight: FontWeight.w400, 
-                                  color: Colors.black,
-                                ),
-                              )
-                            : SizedBox.shrink()  
-                          ),
-                        ],
-                      )
-                    ],
-                  )
-                ],
-              ),
-            );
-          },
-        ),
-      ],
-    );
+  Color _getStatusColor(String status) {
+    switch (status) {
+      case 'Pending': return const Color(0xffFFDE21);
+      case 'Accepted': return const Color(0xff56D47A);
+      case 'Completed': return const Color(0xffAFAFAF);
+      default: return Colors.grey;
+    }
   }
 
   Padding selectBar() {
@@ -303,182 +208,54 @@ class _HistoryState extends State<History> {
       padding: const EdgeInsets.symmetric(horizontal: 23),
       child: Container(
         height: 40,
-        decoration: BoxDecoration(
-          color: Color(0xffC7C9CF),
-          borderRadius: BorderRadius.circular(15),
-        ),
-        child: Row(
-          children: [
-            Expanded(
-              child: ChoiceChip(
-                selected: selectedFilter == 0,
-                onSelected: (bool selected) => setState(() => selectedFilter = 0),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(15),
-                ),
-                selectedColor: Color(0xff717171),
-                backgroundColor: Color(0xffC7C9CF),
-                label: Center(
-                  child: Padding(
-                    padding: const EdgeInsets.only(bottom: 15),
-                    child: Text(
-                      "Requests",
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            Expanded(
-              child: ChoiceChip(
-                selected: selectedFilter == 1,
-                onSelected: (bool selected) => setState(() => selectedFilter = 1),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(15),
-                ),
-                selectedColor: Color(0xff717171),
-                backgroundColor: Color(0xffC7C9CF),
-                label: Center(
-                  child: Padding(
-                    padding: const EdgeInsets.only(bottom: 15),
-                    child: Text(
-                      "Accepted",
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            Expanded(
-              child: ChoiceChip(
-                selected: selectedFilter == 2,
-                onSelected: (bool selected) => setState(() => selectedFilter = 2),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(15),
-                ),
-                selectedColor: Color(0xff717171),
-                backgroundColor: Color(0xffC7C9CF),
-                label: Center(
-                  child: Padding(
-                    padding: const EdgeInsets.only(bottom: 15),
-                    child: Text(
-                      "Completed",
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
+        decoration: BoxDecoration(color: const Color(0xffC7C9CF), borderRadius: BorderRadius.circular(15)),
+        child: Row(children: [
+            Expanded(child: filterChip("Requests", 0)),
+            Expanded(child: filterChip("Accepted", 1)),
+            Expanded(child: filterChip("Completed", 2)),
+        ]),
       ),
     );
   }
 
+  Widget filterChip(String label, int index) {
+    return ChoiceChip(
+        selected: _selectedFilter == index,
+        onSelected: (bool selected) => setState(() => _selectedFilter = index),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+        selectedColor: const Color(0xff717171),
+        backgroundColor: const Color(0xffC7C9CF),
+        label: Center(child: Text(label, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.black))),
+        padding: EdgeInsets.zero,
+    );
+  }
+
   Widget searchBox() {
-    return Align(
-      alignment: Alignment.topCenter,
-      child: Container(
-        margin: const EdgeInsets.only(top: 40),
-        height: 206, 
-        width: 362, 
+    return Align(alignment: Alignment.topCenter,
+      child: Container(margin: const EdgeInsets.only(top: 40), height: 206, width: 362,
         padding: const EdgeInsets.symmetric(horizontal: 20),
-        decoration: BoxDecoration(
-          color: Colors.black, 
-          borderRadius: BorderRadius.circular(5),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.end,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Container(
-                  width: 56, 
-                  height: 56,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Color(0xff343738),
-                  ),
-                  child: Center(
-                    child: SvgPicture.asset(
-                      'assets/icons/profile.svg',
-                      width: 25,
-                      height: 25,
-                    ),
-                  ),
-                ),
-                Container(
-                  width: 56, 
-                  height: 56, 
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Color(0xff343738),
-                  ),
-                  child: Center(
-                    child: SvgPicture.asset(
-                      'assets/icons/notifications.svg',
-                      width: 25, 
-                      height: 25, 
-                    ),
-                  ),
-                ),
-              ]
-            ),
-            Padding(
-              padding: const EdgeInsets.only(right: 100, top: 10),
-              child: Text(
-                'Search Orders',
-                style: TextStyle(
-                  color: Colors.white, 
-                  fontSize: 30,
-                  fontWeight: FontWeight.w100
-                ),
+        decoration: BoxDecoration(color: Colors.black, borderRadius: BorderRadius.circular(5)),
+        child: Column(mainAxisAlignment: MainAxisAlignment.end, crossAxisAlignment: CrossAxisAlignment.center, children: [
+            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, crossAxisAlignment: CrossAxisAlignment.end, children: [
+              Container(width: 56, height: 56, decoration: const BoxDecoration(shape: BoxShape.circle, color: Color(0xff343738)),
+                child: Center(child: SvgPicture.asset('assets/icons/profile.svg', width: 25, height: 25)),
               ),
+              Container(width: 56, height: 56, decoration: const BoxDecoration(shape: BoxShape.circle, color: Color(0xff343738)),
+                child: Center(child: SvgPicture.asset('assets/icons/notifications.svg', width: 25, height: 25)),
+              ),
+            ]),
+            const Padding(padding: EdgeInsets.only(right: 100, top: 10),
+              child: Text('Search Orders', style: TextStyle(color: Colors.white, fontSize: 30, fontWeight: FontWeight.w100)),
             ),
-            Padding( 
-              padding: const EdgeInsets.symmetric(vertical: 20),
-              child: SizedBox(
-                width: 320,
-                height: 45,
-                child: Container(
-                  padding: EdgeInsets.only(right:18),
-                  decoration: BoxDecoration(
-                    color: Color(0xffD9D9D9),
-                    borderRadius: BorderRadius.circular(15),
-                  ),
-                  child: TextField(
-                    decoration: InputDecoration(
-                      filled: true, 
-                      fillColor: Color(0xffD9D9D9),
-                      contentPadding: EdgeInsets.all(15),
-                      hintText: 'Search for works',
-                      hintStyle: TextStyle(
-                        color: Color(0xffADADAD), 
-                        fontSize: 14
-                      ),
-                      prefixIcon: Padding(
-                        padding: const EdgeInsets.all(12), 
-                        child: SvgPicture.asset('assets/icons/search.svg'),
-                      ),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(15),
-                        borderSide: BorderSide.none
-                      ),
+            Padding( padding: const EdgeInsets.symmetric(vertical: 20),
+              child: SizedBox(width: 320, height: 45,
+                child: Container(padding: const EdgeInsets.only(right:18),
+                  decoration: BoxDecoration(color: const Color(0xffD9D9D9), borderRadius: BorderRadius.circular(15)),
+                  child: TextField(decoration: InputDecoration(filled: true, fillColor: const Color(0xffD9D9D9),
+                      contentPadding: const EdgeInsets.all(15), hintText: 'Search for works',
+                      hintStyle: const TextStyle(color: Color(0xffADADAD), fontSize: 14),
+                      prefixIcon: Padding(padding: const EdgeInsets.all(12), child: SvgPicture.asset('assets/icons/search.svg')),
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide.none),
                     ),
                   ),
                 ),

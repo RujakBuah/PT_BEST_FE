@@ -1,14 +1,11 @@
-// lib/main.dart   ← keep this as your app entry point
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-
-// ── core (after-auth) pages ────────────────────────────────
 import 'package:pt_best/pages/jobList.dart';
 import 'package:pt_best/pages/login.dart';
 import 'package:pt_best/pages/mainEntry.dart';
 import 'package:pt_best/pages/register.dart';
 import 'package:pt_best/pages/skillDev.dart';
-import 'package:pt_best/pages/home.dart';          // History()
+import 'package:pt_best/pages/home.dart';
 
 void main() {
   runApp(const MyApp());
@@ -24,28 +21,18 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         fontFamily: 'Inter',
         scaffoldBackgroundColor: const Color(0xffAFAFAF),
-        chipTheme: const ChipThemeData(
-          iconTheme: IconThemeData(),
-          showCheckmark: false,
-        ),
       ),
-
-      // ── ROUTING ────────────────────────────────────────────
-      initialRoute: '/',              // show entry page first
+      initialRoute: '/',
       routes: {
-        '/':        (context) => const MainEntryPage(),
-        '/login':   (context) => const LoginPage(),
-        '/register':(context) => const RegisterPage(),
-
-        // once authenticated, pushReplacementNamed(context, '/main');
-        '/main':    (context) => const MainPage(),
+        '/': (context) => const MainEntryPage(),
+        '/login': (context) => const LoginPage(),
+        '/register': (context) => const RegisterPage(),
+        '/main': (context) => const MainPage(),
       },
     );
   }
 }
 
-// ─────────────────────────────────────────────────────────────
-// MainPage = the “inside” of the app (bottom navigation, etc.)
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
 
@@ -55,12 +42,33 @@ class MainPage extends StatefulWidget {
 
 class _MainPageState extends State<MainPage> {
   int _current = 0;
+  // Keys now use the PUBLIC State class names
+  final GlobalKey<HistoryState> _historyKey = GlobalKey<HistoryState>();
+  final GlobalKey<jobListState> _jobListKey = GlobalKey<jobListState>();
 
-  final List<Widget> _pages = [
-    const jobList(),
-    const skillPage(),   // rename to skillDev() if that’s the actual widget
-    const History(),
-  ];
+  late final List<Widget> _pages;
+
+  @override
+  void initState() {
+    super.initState();
+    _pages = [
+      jobList(key: _jobListKey, onJobApplied: _onJobAction),
+      const skillPage(),
+      History(key: _historyKey, onJobResigned: _onJobAction),
+    ];
+  }
+
+  void _onJobAction({bool switchToOrders = false}) {
+    // These calls will now work because the methods and classes are public.
+    _historyKey.currentState?.fetchOrders();
+    _jobListKey.currentState?.fetchData();
+
+    if (switchToOrders) {
+      setState(() {
+        _current = 2; // Switch to the Orders tab
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -110,16 +118,16 @@ class _MainPageState extends State<MainPage> {
     return Container(
       width: 40,
       height: 40,
+      padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         color: _current == index ? Colors.black : const Color(0xffC6C9CF),
       ),
-      child: Center(
-        child: SvgPicture.asset(
-          asset,
-          width: 24,
-          height: 24,
-          color: _current == index ? Colors.white : Colors.black,
+      child: SvgPicture.asset(
+        asset,
+        colorFilter: ColorFilter.mode(
+          _current == index ? Colors.white : Colors.black,
+          BlendMode.srcIn,
         ),
       ),
     );
