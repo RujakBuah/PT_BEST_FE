@@ -1,10 +1,14 @@
-// lib/pages/main_page.dart
-
+// lib/main.dart   ← keep this as your app entry point
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:pt_best/pages/home.dart';
+
+// ── core (after-auth) pages ────────────────────────────────
 import 'package:pt_best/pages/jobList.dart';
+import 'package:pt_best/pages/login.dart';
+import 'package:pt_best/pages/mainEntry.dart';
+import 'package:pt_best/pages/register.dart';
 import 'package:pt_best/pages/skillDev.dart';
+import 'package:pt_best/pages/home.dart';          // History()
 
 void main() {
   runApp(const MyApp());
@@ -20,13 +24,28 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         fontFamily: 'Inter',
         scaffoldBackgroundColor: const Color(0xffAFAFAF),
-        chipTheme: ChipThemeData(iconTheme: IconThemeData(), showCheckmark: false)
+        chipTheme: const ChipThemeData(
+          iconTheme: IconThemeData(),
+          showCheckmark: false,
+        ),
       ),
-      home: MainPage(),
+
+      // ── ROUTING ────────────────────────────────────────────
+      initialRoute: '/',              // show entry page first
+      routes: {
+        '/':        (context) => const MainEntryPage(),
+        '/login':   (context) => const LoginPage(),
+        '/register':(context) => const RegisterPage(),
+
+        // once authenticated, pushReplacementNamed(context, '/main');
+        '/main':    (context) => const MainPage(),
+      },
     );
   }
 }
 
+// ─────────────────────────────────────────────────────────────
+// MainPage = the “inside” of the app (bottom navigation, etc.)
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
 
@@ -35,28 +54,25 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
-  int myIndex = 0;
+  int _current = 0;
 
-  final List<Widget> pages = [
-    jobList(),
-    skillPage(),
-    History(),
+  final List<Widget> _pages = [
+    const jobList(),
+    const skillPage(),   // rename to skillDev() if that’s the actual widget
+    const History(),
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: IndexedStack(
-        index: myIndex,
-        children: pages,
-      ),
-      bottomNavigationBar: navigationBar(),
+      body: IndexedStack(index: _current, children: _pages),
+      bottomNavigationBar: _buildNavigationBar(),
     );
   }
 
-  Widget navigationBar() {
+  Widget _buildNavigationBar() {
     return Padding(
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.all(16),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
         decoration: BoxDecoration(
@@ -65,27 +81,23 @@ class _MainPageState extends State<MainPage> {
         ),
         child: BottomNavigationBar(
           backgroundColor: Colors.transparent,
-          currentIndex: myIndex,
+          currentIndex: _current,
           elevation: 0,
           type: BottomNavigationBarType.fixed,
           selectedItemColor: Colors.black,
           unselectedItemColor: const Color(0xffC6C9CF),
-          onTap: (index) {
-            setState(() {
-              myIndex = index;
-            });
-          },
+          onTap: (index) => setState(() => _current = index),
           items: [
             BottomNavigationBarItem(
-              icon: buildIcon('assets/icons/history.svg', 0),
+              icon: _buildIcon('assets/icons/history.svg', 0),
               label: 'Search Jobs',
             ),
             BottomNavigationBarItem(
-              icon: buildIcon('assets/icons/certification.svg', 1),
+              icon: _buildIcon('assets/icons/certification.svg', 1),
               label: 'Skills',
             ),
             BottomNavigationBarItem(
-              icon: buildIcon('assets/icons/orders.svg', 2),
+              icon: _buildIcon('assets/icons/orders.svg', 2),
               label: 'Orders',
             ),
           ],
@@ -94,20 +106,20 @@ class _MainPageState extends State<MainPage> {
     );
   }
 
-  Widget buildIcon(String asset, int index) {
+  Widget _buildIcon(String asset, int index) {
     return Container(
       width: 40,
       height: 40,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: myIndex == index ? Colors.black : const Color(0xffC6C9CF),
+        color: _current == index ? Colors.black : const Color(0xffC6C9CF),
       ),
       child: Center(
         child: SvgPicture.asset(
           asset,
           width: 24,
           height: 24,
-          color: myIndex == index ? Colors.white : Colors.black,
+          color: _current == index ? Colors.white : Colors.black,
         ),
       ),
     );
